@@ -1,0 +1,368 @@
+{
+  "name": "Погода",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.open-meteo.com/v1/forecast?latitude={{ $json.latitude }}&longitude={{ $json.longitude }}&current=temperature_2m,weathercode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -448,
+        16
+      ],
+      "id": "43f370fc-1f22-458b-af55-5c8f16de3d1a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -352
+      ],
+      "id": "105c6213-12bb-4f14-aadb-31bf2190e62a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        -112
+      ],
+      "id": "81a150a7-def0-4a4b-9865-b158433a3c47",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c7382674-3a6a-436a-9921-8386f17bbe7f",
+              "name": "=city",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "971271b5-ca08-465d-9037-d003550b235c",
+              "name": "=temp",
+              "value": "={{ $json.temperature }}",
+              "type": "string"
+            },
+            {
+              "id": "6c047b05-6458-4c65-bcfc-32a651c86e80",
+              "name": "=message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        80
+      ],
+      "id": "0034baea-c51c-4504-8b8f-2707c8346ddd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { city: \"Chernivtsi\", latitude: 48.29, longitude: 25.93 } },\n  { json: { city: \"Kyiv\", latitude: 50.45, longitude: 30.52 } },\n  { json: { city: \"Odesa\", latitude: 46.48, longitude: 30.72 } },\n  { json: { city: \"Lviv\", latitude: 49.84, longitude: 24.03 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        -32
+      ],
+      "id": "dc1d40ce-e566-48b6-915c-49a39c503d03",
+      "name": "all"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current.temperature_2m }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    },
+                    "id": "986b3a39-41b0-495e-bd23-21a1e377a398"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "31cd1df5-43be-4704-bb7b-8210e73e51f0",
+                    "leftValue": "={{ $json.current.temperature_2m }}",
+                    "rightValue": 15,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5ec331b2-6f8d-4135-be67-060e26f563ca",
+                    "leftValue": "={{ $json.current.temperature_2m }}",
+                    "rightValue": 25,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4f8ded9f-d6c1-436f-ae85-76a305c19244",
+                    "leftValue": "={{ $json.current.temperature_2m }}\n",
+                    "rightValue": 25,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -16
+      ],
+      "id": "46a47f41-3e4c-48f1-a9ce-2909ba593622",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items.map(item => ({\n  json: {\n    city: item.json.city,\n    temperature: item.json.current.temperature_2m,\n    condition: \"морозно\",\n    message: `${item.json.city}: ${item.json.current.temperature_2m}°C, морозно ❄️`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -432
+      ],
+      "id": "c9999f76-20cb-47f4-bc13-8dd9a027980b",
+      "name": "Morozno"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items.map(item => ({\n  json: {\n    city: item.json.city,\n    temperature: item.json.current.temperature_2m,\n    condition: \"прохолодно\",\n    message: `${item.json.city}: ${item.json.current.temperature_2m}°C, прохолодно`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        -256
+      ],
+      "id": "561f5419-1f04-4c29-a0d6-ee44c6b98ac2",
+      "name": "Prohl"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items.map(item => ({\n  json: {\n    city: item.json.city,\n    temperature: item.json.current.temperature_2m,\n    condition: \"комфортно\",\n    message: `${item.json.city}: ${item.json.current.temperature_2m}°C, комфортно`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        48
+      ],
+      "id": "fc2e25c6-5f76-4087-a873-80f8b36f0d29",
+      "name": "Komfort"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items.map(item => ({\n  json: {\n    city: item.json.city,\n    temperature: item.json.current.temperature_2m,\n    condition: \"спекотно\",\n    message: `${item.json.city}: ${item.json.current.temperature_2m}°C, спекотно ⚠️`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        320
+      ],
+      "id": "05ded203-8c1d-4fe7-b348-e0a768037661",
+      "name": "Hot"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst allCities = $('all').all();\n\nreturn items.map((item, index) => ({\n  json: {\n    ...item.json,\n    city: allCities[index].json.city\n  }\n}));;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "65ef4846-c623-4db6-8efd-b9e0cb2a8f51",
+      "name": "Attach City"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Attach City",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "all",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "all": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Morozno",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prohl",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Komfort",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach City": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8425df1c-ee85-4e1b-a6f3-a1e5c8a559cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7284fdd2a83aa24c2062139f966e08b24749e4f8522935d4ee2f52d6d1ca9acc"
+  },
+  "id": "8GK71CEervICCVfz",
+  "tags": []
+}
